@@ -9,7 +9,7 @@ def rgb2gray(rgb):
 
 
 class Img:
-
+    my_img = Img('~/PycharmProjects/ImageProcessingService/bb.jpg')
     def __init__(self, path):
         """
         Do not change the constructor implementation
@@ -63,5 +63,32 @@ class Img:
         raise NotImplementedError()
 
     def segment(self):
+        my_img = Img('~/PycharmProjects/ImageProcessingService/bb.jpg')
+        with open(my_img, 'rb') as f:
+            image_data = f.read()
+        threshold = 100
+        segmented_pixels = []
+
+        for pixel_value in image_data:
+            if pixel_value > threshold:
+                segmented_pixels.append(255)
+            else:
+                segmented_pixels.append(0)
+
+        image_width = int(len(image_data) ** 0.5)
+        segmented_image = []
+        row = []
+
+        for i, pixel in enumerate(segmented_pixels):
+            row.append(pixel)
+            if (i + 1) % image_width == 0:
+                segmented_image.append(row)
+                row = []
+
+        for row in segmented_image:
+            print(row)
+
+        my_img.segment()
+        new_img = my_img.save_img()
         # TODO remove the `raise` below, and write your implementation
         raise NotImplementedError()
