@@ -1,20 +1,18 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
-
+from PIL import Image
 
 def rgb2gray(rgb):
     r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
     return gray
 
-
 class Img:
-    my_img = Img('~/PycharmProjects/ImageProcessingService/bb.jpg')
     def __init__(self, path):
         """
         Do not change the constructor implementation
         """
-        self.path = Path(path)
+        self.path = path
         self.data = rgb2gray(imread(path)).tolist()
 
     def save_img(self):
@@ -25,70 +23,34 @@ class Img:
         imsave(new_path, self.data, cmap='gray')
         return new_path
 
-    def blur(self, blur_level=16):
+    def segment(self, threshold=100):
+        # Open the image
+        with open(self.path, 'rb') as f:
+            image = Image.open(f)
+            image_width, image_height = image.size
 
-        height = len(self.data)
-        width = len(self.data[0])
-        filter_sum = blur_level ** 2
+            # Create a new image for segmented pixels
+            segmented_image = Image.new('L', (image_width, image_height))
 
-        result = []
-        for i in range(height - blur_level + 1):
-            row_result = []
-            for j in range(width - blur_level + 1):
-                sub_matrix = [row[j:j + blur_level] for row in self.data[i:i + blur_level]]
-                average = sum(sum(sub_row) for sub_row in sub_matrix) // filter_sum
-                row_result.append(average)
-            result.append(row_result)
+            # Load pixel data
+            pixels = image.load()
+            segmented_pixels = segmented_image.load()
 
-        self.data = result
 
-    def contour(self):
-        for i, row in enumerate(self.data):
-            res = []
-            for j in range(1, len(row)):
-                res.append(abs(row[j-1] - row[j]))
+            # Segment the image based on threshold
+            for y in range(image_height):
+                for x in range(image_width):
+                    pixel_value = pixels[x, y][0]
+                    segmented_pixels[x, y] = 255 if pixel_value > threshold else 0
 
-            self.data[i] = res
 
-    def rotate(self):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
 
-    def salt_n_pepper(self):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+            # Display the segmented image
+            segmented_image.show()
 
-    def concat(self, other_img, direction='horizontal'):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
-
-    def segment(self):
-        my_img = Img('~/PycharmProjects/ImageProcessingService/bb.jpg')
-        with open(my_img, 'rb') as f:
-            image_data = f.read()
-        threshold = 100
-        segmented_pixels = []
-
-        for pixel_value in image_data:
-            if pixel_value > threshold:
-                segmented_pixels.append(255)
-            else:
-                segmented_pixels.append(0)
-
-        image_width = int(len(image_data) ** 0.5)
-        segmented_image = []
-        row = []
-
-        for i, pixel in enumerate(segmented_pixels):
-            row.append(pixel)
-            if (i + 1) % image_width == 0:
-                segmented_image.append(row)
-                row = []
-
-        for row in segmented_image:
-            print(row)
-
-        my_img.segment()
-        new_img = my_img.save_img()
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+# Example usage
+if __name__ == "__main__":
+    image_path = '/home/asyas/PycharmProjects/ImageProcessingService/bb.jpg'
+    img_instance = Img(image_path)
+    img_instance.segment()
+    img_instance.save_img()
