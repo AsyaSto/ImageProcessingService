@@ -6,7 +6,7 @@ from bot import Bot, QuoteBot, ImageProcessingBot
 app = flask.Flask(__name__)
 
 TELEGRAM_TOKEN = os.environ['6794114675:AAFiRhpKtB2_DhUwmFPxsMSg7V2-ji4SjAQ']
-TELEGRAM_APP_URL = os.environ['http://localhost:8443']
+TELEGRAM_APP_URL = os.environ['https://898b-5-29-57-163.ngrok-free.app']
 
 
 @app.route('/', methods=['GET'])
