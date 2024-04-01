@@ -75,4 +75,71 @@ class QuoteBot(Bot):
 
 
 class ImageProcessingBot(Bot):
-    pass
+    def handle_message(self, msg):
+        try:
+            logger.info(f'Incoming message: {msg}')
+
+            if self.is_current_msg_photo(msg):
+                img_path = self.download_user_photo(msg)
+                caption = msg.get('caption', '')
+
+                if caption == 'Blur':
+                    # Process the image to apply blur effect
+                    img_processor = Img(img_path)
+                    processed_img_path = img_processor.apply_blur()
+
+                    # Send the processed image to the user
+                    self.send_photo(msg['chat']['id'], processed_img_path)
+
+                elif caption == 'Contour':
+                    # Process the image to find contours
+                    img_processor = Img(img_path)
+                    processed_img_path = img_processor.find_contours()
+
+                    # Send the processed image to the user
+                    self.send_photo(msg['chat']['id'], processed_img_path)
+
+                elif caption == 'Rotate':
+                    # Process the image to rotate
+                    img_processor = Img(img_path)
+                    processed_img_path = img_processor.rotate()
+
+                    # Send the processed image to the user
+                    self.send_photo(msg['chat']['id'], processed_img_path)
+
+                elif caption == 'Segment':
+                    # Process the image to segment
+                    img_processor = Img(img_path)
+                    processed_img_path = img_processor.segment()
+
+                    # Send the processed image to the user
+                    self.send_photo(msg['chat']['id'], processed_img_path)
+
+                elif caption == 'Salt and pepper':
+                    # Process the image to add salt and pepper noise
+                    img_processor = Img(img_path)
+                    processed_img_path = img_processor.add_salt_and_pepper_noise()
+
+                    # Send the processed image to the user
+                    self.send_photo(msg['chat']['id'], processed_img_path)
+
+                elif caption == 'Concat':
+                    # Process the image to concatenate
+                    img_processor = Img(img_path)
+                    processed_img_path = img_processor.concatenate()
+
+                    # Send the processed image to the user
+                    self.send_photo(msg['chat']['id'], processed_img_path)
+
+                else:
+                    # Caption value not recognized
+                    self.send_text(msg['chat']['id'], "Invalid caption. Please provide one of the following: ['Blur', 'Contour', 'Rotate', 'Segment', 'Salt and pepper', 'Concat']")
+
+            else:
+                # Message does not contain a photo
+                self.send_text(msg['chat']['id'], "Please send a photo with a caption for processing.")
+
+        except Exception as e:
+            logger.error(f"Error processing image: {e}")
+            self.send_text(msg['chat']['id'], "Something went wrong... please try again.")
+

@@ -23,6 +23,42 @@ class Img:
         imsave(new_path, self.data, cmap='gray')
         return new_path
 
+    def blur(self, blur_level=16):
+
+        height = len(self.data)
+        width = len(self.data[0])
+        filter_sum = blur_level ** 2
+
+        result = []
+        for i in range(height - blur_level + 1):
+            row_result = []
+            for j in range(width - blur_level + 1):
+                sub_matrix = [row[j:j + blur_level] for row in self.data[i:i + blur_level]]
+                average = sum(sum(sub_row) for sub_row in sub_matrix) // filter_sum
+                row_result.append(average)
+            result.append(row_result)
+
+        self.data = result
+
+    def contour(self):
+        for i, row in enumerate(self.data):
+            res = []
+            for j in range(1, len(row)):
+                res.append(abs(row[j - 1] - row[j]))
+
+            self.data[i] = res
+
+    def rotate(self):
+        pass
+
+    def salt_n_pepper(self):
+        # TODO remove the `raise` below, and write your implementation
+        pass
+
+    def concat(self, other_img, direction='horizontal'):
+        # TODO remove the `raise` below, and write your implementation
+        pass
+
     def segment(self, threshold=100):
         # Open the image
         with open(self.path, 'rb') as f:
