@@ -1,6 +1,5 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
-from PIL import Image
 
 def rgb2gray(rgb):
     r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
@@ -12,7 +11,7 @@ class Img:
         """
         Do not change the constructor implementation
         """
-        self.path = path
+        self.path = Path(path)
         self.data = rgb2gray(imread(path)).tolist()
 
     def save_img(self):
@@ -23,8 +22,7 @@ class Img:
         imsave(new_path, self.data, cmap='gray')
         return new_path
 
-    def blur(self, blur_level=16):
-
+    def apply_blur(self, blur_level=16):
         height = len(self.data)
         width = len(self.data[0])
         filter_sum = blur_level ** 2
@@ -39,50 +37,35 @@ class Img:
             result.append(row_result)
 
         self.data = result
+        return self.save_img()
 
-    def contour(self):
+    def find_contours(self):
         for i, row in enumerate(self.data):
             res = []
             for j in range(1, len(row)):
                 res.append(abs(row[j - 1] - row[j]))
-
             self.data[i] = res
+        return self.save_img()
 
     def rotate(self):
         pass
 
-    def salt_n_pepper(self):
-        # TODO remove the `raise` below, and write your implementation
+    def add_salt_and_pepper_noise(self):
         pass
 
-    def concat(self, other_img, direction='horizontal'):
-        # TODO remove the `raise` below, and write your implementation
+    def concatenate(self, other_img, direction='horizontal'):
         pass
 
     def segment(self, threshold=100):
-        # Open the image
-        with open(self.path, 'rb') as f:
-            image = Image.open(f)
-            image_width, image_height = image.size
+        segmented_data = []
+        for row in self.data:
+            segmented_row = []
+            for pixel in row:
+                segmented_row.append(255 if pixel > threshold else 0)
+            segmented_data.append(segmented_row)
 
-            # Create a new image for segmented pixels
-            segmented_image = Image.new('L', (image_width, image_height))
-
-            # Load pixel data
-            pixels = image.load()
-            segmented_pixels = segmented_image.load()
-
-
-            # Segment the image based on threshold
-            for y in range(image_height):
-                for x in range(image_width):
-                    pixel_value = pixels[x, y][0]
-                    segmented_pixels[x, y] = 255 if pixel_value > threshold else 0
-
-
-
-            # Display the segmented image
-            segmented_image.show()
+        self.data = segmented_data
+        return self.save_img()
 
 # Example usage
 if __name__ == "__main__":
